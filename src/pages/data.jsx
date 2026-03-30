@@ -4,8 +4,7 @@ export default function Data() {
 
     // Guarda a lista de valores digitados.
     // Perceba que o estado é inicializado como um array vazio, pois a lista começa sem nenhum valor.
-    const [listaDeValores, setListaDeValores]
-        = useState([])
+    const [listaDeValores, setListaDeValores] = useState([])
 
     // Guarda o valor atual do campo de texto.
     // O estado é inicializado como uma string vazia, pois o campo começa sem nenhum texto.
