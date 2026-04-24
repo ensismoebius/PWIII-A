@@ -36,7 +36,7 @@ import express from 'express'
 // (que roda em outro domínio/porta) acesse os dados do backend sem ser bloqueado. 
 // O cors é um middleware que facilita a configuração dessas permissões.
 import cors from 'cors'
-import { query } from './db.js'
+import { createUser, deleteUser, getUsers, updateUser } from './db.js'
 
 // request - Representa o que chegou do cliente (navegador, frontend, etc.).
 // request.params: parâmetros da rota
@@ -50,10 +50,60 @@ import { query } from './db.js'
 // response.send(data): envia uma resposta genérica
 async function loadUsers(request, response) {
     try {
-        const users = await query('SELECT id, name, email FROM users')
+        const users = await getUsers()
         response.json(users)
     } catch (err) {
         console.error('Erro em /api/users:', err)
+        response.status(500).json({ error: err.message })
+    }
+}
+
+async function addUser(request, response) {
+    try {
+        const { name, email } = request.body
+        if (!name || !email) {
+            response.status(400).json({ error: 'name e email sao obrigatorios' })
+            return
+        }
+        const user = await createUser({ name, email })
+        response.status(201).json(user)
+    } catch (err) {
+        console.error('Erro em POST /api/users:', err)
+        response.status(500).json({ error: err.message })
+    }
+}
+
+async function editUser(request, response) {
+    try {
+        const { id } = request.params
+        const { name, email } = request.body
+        if (!name || !email) {
+            response.status(400).json({ error: 'name e email sao obrigatorios' })
+            return
+        }
+        const user = await updateUser(id, { name, email })
+        if (!user) {
+            response.status(404).json({ error: 'usuario nao encontrado' })
+            return
+        }
+        response.json(user)
+    } catch (err) {
+        console.error('Erro em PUT /api/users/:id:', err)
+        response.status(500).json({ error: err.message })
+    }
+}
+
+async function removeUser(request, response) {
+    try {
+        const { id } = request.params
+        const removed = await deleteUser(id)
+        if (!removed) {
+            response.status(404).json({ error: 'usuario nao encontrado' })
+            return
+        }
+        response.status(204).end()
+    } catch (err) {
+        console.error('Erro em DELETE /api/users/:id:', err)
         response.status(500).json({ error: err.message })
     }
 }
@@ -68,9 +118,11 @@ const app = express()
 app.use(express.json()) // Middleware para validar e ler JSON no corpo das requisições
 app.use(cors()) // Middleware para habilitar CORS (Cross-Origin Resource Sharing)
 
-// GET /api/users — retorna todos os usuários do MySQL
+// Define as rotas da API para lidar com operações CRUD (Create, Read, Update, Delete)
 app.get('/api/users', loadUsers)
-
+app.post('/api/users', addUser)
+app.put('/api/users/:id', editUser)
+app.delete('/api/users/:id', removeUser)
 
 // Inicia o servidor na porta definida na variável de ambiente PORT ou 4000 por padrão
 // eslint-disable-next-line no-undef
