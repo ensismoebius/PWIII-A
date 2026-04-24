@@ -37,3 +37,29 @@ export function saveItems(items) {
         console.error('Erro ao salvar itens no localStorage:', error);
     }
 }
+
+export function removeItem(id) {
+
+    try {
+        // Para remover um item, primeiro obtemos a lista atual de
+        //  itens, filtramos para remover o item com o id especificado 
+        // e depois salvamos a nova lista de volta no localStorage.
+
+        // TODO - Explicar o bug: O banco de dados não estava sendo atualizado
+        // Pois o objeto não tinha a propriedade id, então para remover um item,
+
+        // Este objetos NÃO tem a propriedade id, então para remover um item, 
+        // precisamos usar o índice do item na lista.
+        // const items = getItems().filter(item => item.id !== id);
+
+        // O método filter cria um novo array com todos os elementos que 
+        // passam no teste implementado pela função fornecida. Neste caso, 
+        // estamos criando um novo array que inclui todos os itens, exceto 
+        // aquele cujo índice é igual ao id fornecido.
+        const items = getItems().filter((item, index) => index !== id);
+
+        saveItems(items);
+    } catch (error) {
+        console.error('Erro ao remover item do localStorage:', error);
+    }
+}
