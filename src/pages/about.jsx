@@ -7,7 +7,7 @@ function About() {
     return (
         <>
             <h1>Sobre</h1>
-            <h1>Essas mulheres e homens <em>gostosos</em></h1>
+            <h1>Essas mulheres e homens gostosos</h1>
             <img
                 src={hotgirls}
                 alt="Hot Girls"

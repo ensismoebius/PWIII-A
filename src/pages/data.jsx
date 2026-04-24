@@ -11,42 +11,33 @@ function DataPage() {
         setItems(getItems())
     }, [])
 
-    function onAddItem(event) {
-        event.preventDefault()
+    function handleAdd(e) {
+        e.preventDefault()
         const value = text.trim()
         if (!value) return
-
-        const new_item = addItem({ text: value })
-        setItems(previous_list => [new_item, ...previous_list])
+        const item = addItem({ text: value })
+        setItems(prev => [item, ...prev])
         setText('')
     }
 
-    function onRemoveItem(item_id) {
-        removeItem(item_id)
-        setItems(previous_list => previous_list.filter(i => i.id !== item_id))
+    function handleRemove(id) {
+        removeItem(id)
+        setItems(prev => prev.filter(i => i.id !== id))
     }
 
     return (
         <>
             <h1>Dados (localStorage)</h1>
-            <form onSubmit={onAddItem} style={{ marginBottom: 12 }}>
+            <form onSubmit={handleAdd} style={{ marginBottom: 12 }}>
                 <input value={text} onChange={e => setText(e.target.value)} placeholder="Novo item" />
                 <button type="submit">Adicionar</button>
             </form>
 
             <ul>
                 {items.map(item => (
-                    <li
-                        key={item.id}
-                        style={{ marginBottom: 6 }}
-                    >
-                        {item.text}
-                        <button
-                            onClick={() => onRemoveItem(item.id)}
-                            style={{ marginLeft: 12 }}
-                        >
-                            Remover
-                        </button>
+                    <li key={item.id} style={{ marginBottom: 6 }}>
+                        {item.text}{' '}
+                        <button onClick={() => handleRemove(item.id)}>Remover</button>
                     </li>
                 ))}
             </ul>
