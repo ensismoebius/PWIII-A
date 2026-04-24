@@ -70,6 +70,7 @@ export default function Data() {
                     <tr>
                         <th>Índice</th>
                         <th>Valor</th>
+                        <th>Operações</th>
                     </tr>
                 </thead>
                 <tbody>
