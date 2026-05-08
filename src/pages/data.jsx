@@ -1,8 +1,9 @@
-// TODO - Implementar o update do CRUD, explicar o bug em db.js: 
-// O banco de dados não estava sedo atualizado.
+// TODO Próxima aula terminar a funcionalidade de edição:
+// Está faltando atualizar, de fato, os dados e alternar para 
+// o modo normal
 
 import { useState } from "react"
-import { saveItems, getItems, removeItem } from "../lib/db.js"
+import { saveItems, getItems, removeItem, updateItem } from "../lib/db.js"
 
 export default function Data() {
 
@@ -13,6 +14,26 @@ export default function Data() {
     // Guarda o valor atual do campo de texto.
     // O estado é inicializado como uma string vazia, pois o campo começa sem nenhum texto.
     const [texto, setTexto] = useState('')
+
+    // Indica se está no modo de edição (padrão = false)
+    const [editando, setModoEdicao] = useState(false);
+
+    // Esse é o texto do botão que manipula os dados
+    const [textoDoBotao, setTextoDoBotao] = useState("Adicionar");
+
+    function atualizaItem(id){
+        // Recupera o valor digitado sem excesso
+        // de espaços
+        const valor = texto.trim()
+
+        // Se estiver vazio simplesment ignora
+        // saindo da função
+        if(!valor){
+            return;
+        }
+
+        setListaDeValores(updateItem(id, {text: valor}))
+    }
 
     // Boa prática: Sempre que possivel, evite atualizar estados
     //dentro do useEffect, isso pode gerar loop de renderização infinitos.
@@ -59,7 +80,7 @@ export default function Data() {
 
             <input
                 type="button"
-                value="Adicionar"
+                value={textoDoBotao}
                 onClick={addItem}
             />
 
@@ -95,6 +116,16 @@ export default function Data() {
                                             // Depois de remover o item do banco de dados, atualizamos o estado para refletir a nova lista de valores.
                                             setListaDeValores(getItems())
                                         }}>X</button>
+
+                                        <button onClick={
+                                            () => {
+                                                // Informa a GUI que entramos no 
+                                                // modo edição
+                                                setModoEdicao(true);
+                                                setTextoDoBotao("Atualizar")
+                                                setTexto(valor)
+                                            }
+                                        }>✏️</button>
                                     </td>
                                 </tr>
                             )

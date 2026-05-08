@@ -45,13 +45,6 @@ export function removeItem(id) {
         //  itens, filtramos para remover o item com o id especificado 
         // e depois salvamos a nova lista de volta no localStorage.
 
-        // TODO - Explicar o bug: O banco de dados não estava sendo atualizado
-        // Pois o objeto não tinha a propriedade id, então para remover um item,
-
-        // Este objetos NÃO tem a propriedade id, então para remover um item, 
-        // precisamos usar o índice do item na lista.
-        // const items = getItems().filter(item => item.id !== id);
-
         // O método filter cria um novo array com todos os elementos que 
         // passam no teste implementado pela função fornecida. Neste caso, 
         // estamos criando um novo array que inclui todos os itens, exceto 
@@ -62,4 +55,33 @@ export function removeItem(id) {
     } catch (error) {
         console.error('Erro ao remover item do localStorage:', error);
     }
+}
+
+export function updateItem(id, updates){
+
+    // Mapeia os itens cujo o id casa com o id informado
+    const items = getItems().map(
+        // A váriável "i" poderia ter outro nome.
+        // O papel dela é guardar uma referência ao
+        // item atual para que possamos fazer as 
+        // verificações
+        i => {
+            // Retorna o objeto cujo id seja igual ao
+            // id informado;
+            return i.id === id ? 
+            // Usa o operador de espalhamento para mesclar
+            // o objeto encontrado com as suas atualizações
+            // Exemplo: i = {id: 1, text: "A"},
+            // updates = {text: "B"}, 
+            // resultado {id: 1, text: "B"}
+            { ...i , ...updates } : 
+            i
+        }
+    )
+
+    // Persiste os itens atualizados
+    saveItems(items)
+
+    // Retorna os itens atualizados
+    return items
 }
