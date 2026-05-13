@@ -57,8 +57,8 @@ export function updateItem(id, updates) {
     const items = getItems().map(i => (i.id === id ? { ...i, ...updates } : i))
     // Persiste os itens atualizados
     saveItems(items)
-    // Retorna o item atualizado (procura pelo id)
-    return items.find(i => i.id === id)
+    // Retorna os items atualizados
+    return items
 }
 
 // Exporta um objeto padrão contendo as funções disponíveis

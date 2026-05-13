@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getItems, addItem, removeItem } from '../lib/db'
+import { getItems, addItem, removeItem, updateItem } from '../lib/db'
 import './App.css'
 
 function DataPage() {
@@ -10,6 +10,8 @@ function DataPage() {
     // inicialização do componente. Assim, evitamos renderizações desnecessárias.  
     const [items, setItems] = useState(() => getItems())
     const [text, setText] = useState('')
+    const [editingId, setEditingId] = useState(null)
+    const [editText, setEditText] = useState('')
 
     function handleAdd(e) {
         e.preventDefault()
@@ -25,6 +27,15 @@ function DataPage() {
         setItems(prev => prev.filter(i => i.id !== id))
     }
 
+    function handleUpdate(id) {
+        const value = editText.trim()
+        if (!value) return
+
+        setItems(updateItem(id, { text: value }))
+        setEditingId(null)
+        setEditText('')
+    }
+
     return (
         <>
             <h1>Dados (localStorage)</h1>
@@ -36,8 +47,19 @@ function DataPage() {
             <ul>
                 {items.map(item => (
                     <li key={item.id} style={{ marginBottom: 6 }}>
-                        {item.text}{' '}
-                        <button onClick={() => handleRemove(item.id)}>Remover</button>
+                        {editingId === item.id ? (
+                            <>
+                                <input value={editText} onChange={e => setEditText(e.target.value)} />
+                                <button onClick={() => handleUpdate(item.id)}>Salvar</button>
+                  q              <button onClick={() => setEditingId(null)}>Cancelar</button>
+                            </>
+                        ) : (
+                            <>
+                                {item.text}{' '}
+                                <button onClick={() => { setEditingId(item.id); setEditText(item.text) }}>Editar</button>
+                                <button onClick={() => handleRemove(item.id)}>Remover</button>
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>
