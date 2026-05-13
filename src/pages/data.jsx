@@ -21,18 +21,21 @@ export default function Data() {
     // Esse é o texto do botão que manipula os dados
     const [textoDoBotao, setTextoDoBotao] = useState("Adicionar");
 
-    function atualizaItem(id){
+    // Guarda o id do valor que está sendo editado
+    const [idSendoEditado, setIdSendoEditado] = useState(0);
+
+    function atualizaItem(id) {
         // Recupera o valor digitado sem excesso
         // de espaços
         const valor = texto.trim()
 
         // Se estiver vazio simplesment ignora
         // saindo da função
-        if(!valor){
+        if (!valor) {
             return;
         }
 
-        setListaDeValores(updateItem(id, {text: valor}))
+        setListaDeValores(updateItem(id, { text: valor }))
     }
 
     // Boa prática: Sempre que possivel, evite atualizar estados
@@ -49,10 +52,19 @@ export default function Data() {
         // Para adicionar um item à lista, criamos uma nova lista que contém todos os itens anteriores mais o novo item.
         // Usamos o operador spread (...) para copiar os itens anteriores da lista e adicionamos o novo texto no final.
 
+        // Cria o elemento que vamos armazenar no novo formato
+        // "Date.now().toString()" gera o que chamamos de "timestamp"
+        // que é a quantidade de segundos desde uma certa data:
+        // Isso serve de chave primária
+        const novoItem = {
+            id: Date.now().toString(),
+            text: texto
+        }
+
         // Por conveniência  criamos uma nova lista que será
         // usada tanto para atualizar o banco de dados quanto 
         // para atualizar o estado.
-        const novaLista = [...listaDeValores, texto];
+        const novaLista = [...listaDeValores, novoItem];
 
         // Atualiza o banco de dados com a nova lista de valores
         saveItems(novaLista);
@@ -62,6 +74,14 @@ export default function Data() {
 
         // Depois de adicionar o item à lista, limpamos o campo de texto para que o usuário possa digitar um novo valor.
         setTexto('')
+    }
+
+    function updateTheItem(){
+        setListaDeValores(updateItem(idSendoEditado, {text: texto}))
+        setModoEdicao(false)
+        setIdSendoEditado(0)
+        setTextoDoBotao("Adicionar")
+        setTexto("")
     }
 
     return (
@@ -81,7 +101,16 @@ export default function Data() {
             <input
                 type="button"
                 value={textoDoBotao}
-                onClick={addItem}
+                onClick={
+                    () => {
+                        if (editando) {
+                            // Salvar a edição e resetar para false o "editando"
+                            updateTheItem();
+                        } else {
+                            addItem();
+                        }
+                    }
+                }
             />
 
             <p>Aqui estão os dados</p>
@@ -104,14 +133,14 @@ export default function Data() {
                         // caso, linhas de uma tabela.
                         listaDeValores.map(
                             // O método map recebe uma função como argumento, essa função é chamada para cada item da lista, e recebe o valor do item e seu índice como parâmetros.
-                            (valor, indice) => (
-                                <tr key={indice}>
-                                    <td>{indice}</td>
-                                    <td>{valor}</td>
+                            (valor) => (
+                                <tr key={valor.id}>
+                                    <td>{valor.id}</td>
+                                    <td>{valor.text}</td>
                                     <td>
                                         <button onClick={() => {
                                             // Para remover um item, chamamos a função removeItem, passando o índice do item a ser removido.
-                                            removeItem(indice);
+                                            removeItem(valor.id);
 
                                             // Depois de remover o item do banco de dados, atualizamos o estado para refletir a nova lista de valores.
                                             setListaDeValores(getItems())
@@ -123,7 +152,8 @@ export default function Data() {
                                                 // modo edição
                                                 setModoEdicao(true);
                                                 setTextoDoBotao("Atualizar")
-                                                setTexto(valor)
+                                                setTexto(valor.text)
+                                                setIdSendoEditado(valor.id)
                                             }
                                         }>✏️</button>
                                     </td>

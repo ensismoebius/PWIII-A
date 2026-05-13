@@ -7,7 +7,7 @@
 // tipos de dados,como usuários, pedidos, 
 // etc, podemos usar chaves diferentes 
 // como 'pwiii-users', 'pwiii-orders', etc.  
-const STORAGE_KEY = 'pwiii-items';
+const STORAGE_KEY = 'pwiii-items2';
 
 export function getItems() {
 
@@ -49,7 +49,7 @@ export function removeItem(id) {
         // passam no teste implementado pela função fornecida. Neste caso, 
         // estamos criando um novo array que inclui todos os itens, exceto 
         // aquele cujo índice é igual ao id fornecido.
-        const items = getItems().filter((item, index) => index !== id);
+        const items = getItems().filter((item) => item.id !== id);
 
         saveItems(items);
     } catch (error) {
